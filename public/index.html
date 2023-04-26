@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+  <link href="stylesheets/chat.css" rel="stylesheet">
+
+  <title>Chat Bot with Lex</title>
+
+  <script type="text/javascript" src="javascripts/jquery-3.6.0.min.js"></script>
+   
+  <script>
+    $(document).ready(function () {
+      //Capturamos el ENTER en el cuadro de entrada para enviar el texto al Backend
+      $("#intexto").keyup(function (e) {
+        if (e.keyCode == 13) {
+          //Desahibilitamos el campo para evitar una DOBLE ENTRADA.
+          $("#intexto").prop("disabled", true)
+          var str = $("#intexto").val();
+          //Agregamos lo que el usuario escribio al CHAT
+          addUserText(str);
+          //Mandamos procesar la entrada del usuario via POST a /lex en le backend
+          $.post("/lex", { text: str }, function (data) {
+            $("#intexto").val("");
+            $("#intexto").prop("disabled", false)
+            //Agregamos lo que el BOT nos contesto al CHAT.
+            addBotText(data.resp);
+            $("#intexto").focus();
+          });
+        }
+      })
+    })
+
+    function addUserText(text) {
+         let html = "<div class=\"d-flex flex-row p-2\"><div class=\"bg-white mr-2 p-2\"><span class=\"text-muted\">"+text+"</span></div>";
+         html = html + "<img src=\"https://img.icons8.com/color/48/000000/circled-user-male-skin-type-7.png\" width=\"30\" height=\"30\"></div>"; ;
+         $("#chat").append(html);
+    }
+
+    function addBotText(text) {
+      let html = "<div class=\"d-flex flex-row p-3\"> <img src=\"https://img.icons8.com/color/48/000000/circled-user-female-skin-type-7.png\" width=\"30\" height=\"30\">"
+      html = html + "<div class=\"chat ml-1 p-3\">"+text+"</div>";
+      $("#chat").append(html);
+    }    
+  </script>
+
+</head>
+
+<body>
+  <div class="container d-flex p-3 justify-content-center">
+    <div class="card mt-2">
+      <div class="d-flex flex-row justify-content-between p-2 hchat text-white"> <i class="fas fa-chevron-left"></i>
+        <span class="pb-3">Directorio BOT</span> <i class="fas fa-times"></i> </div>
+      <div id="chat">
+        <div class="d-flex flex-row p-3"> <img
+          src="https://img.icons8.com/color/48/000000/circled-user-female-skin-type-7.png" width="30" height="30">
+        <div class="chat ml-1 p-3">Hola! Bienvenido al Directorio Bot</div>
+      </div>
+    </div>
+      <div class="form-group px-3"> <input class="form-control" id="intexto" type="text" placeholder="..."></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="javascripts/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
